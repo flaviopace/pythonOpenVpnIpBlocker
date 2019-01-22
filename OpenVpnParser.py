@@ -1,8 +1,10 @@
 import argparse
 import re
+import subprocess
 
 
 PATTERN = 'TLS Error: TLS key negotiation failed'
+OFFSETVALUE = 50
 
 class OpenVPNLogParser(object):
 
@@ -25,9 +27,27 @@ class OpenVPNLogParser(object):
         return re.findall( r'[0-9]+(?:\.[0-9]+){3}', stringIn)[0]
         pass
 
-    def getIpList(self):
+    def getUniqueIpList(self):
 
         return list(set(self.iplist))
+
+    def getIpList(self):
+
+        return self.iplist
+
+
+class RunCommand(object):
+
+    def __init__(self):
+        pass
+
+    def runCommand(self, ipaddr):
+
+        opts = {'iptables':'/sbin/iptables', 'rule':'INPUT', 'ipaddress':ipaddr, 'action':'DROP'}
+        ipcmd = '{iptables} -A {rule} -s {ipaddress} -j {action}'.format(**opts)
+
+        print ipcmd
+        subprocess.call(ipcmd)
 
 
 
@@ -45,5 +65,9 @@ if __name__ == "__main__":
 
     p.parseLog()
 
-    print p.getIpList()
+    rc = RunCommand()
 
+    for item in p.getUniqueIpList():
+        print " {} : {}".format(item, p.getIpList().count(item))
+        if p.getIpList().count(item) > OFFSETVALUE:
+            rc.runCommand(item)
