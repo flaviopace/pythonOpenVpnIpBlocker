@@ -47,7 +47,7 @@ class RunCommand(object):
         ipcmd = '{iptables} -A {rule} -s {ipaddress} -j {action}'.format(**opts)
 
         print ipcmd
-        subprocess.call(ipcmd)
+        subprocess.call(ipcmd, shell=True)
 
 
 
