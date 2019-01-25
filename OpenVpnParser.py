@@ -58,7 +58,7 @@ class RunCommand(object):
 
         out = subprocess.call(ipcmd, shell=True)
 
-        if ipaddr in out:
+        if str(ipaddr) in out:
             print 'Ip Addr already dropped'
             return True
 
