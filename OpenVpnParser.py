@@ -56,9 +56,11 @@ class RunCommand(object):
 
         print ipcmd
 
-        out = subprocess.call(ipcmd, shell=True)
+        p = Popen(ipcmd, stdin=PIPE, stdout=PIPE, stderr=PIPE)
+        output, err = p.communicate(b"input data that is passed to subprocess' stdin")
+        rc = p.returncode
 
-        if str(ipaddr) in out:
+        if ipaddr in output:
             print 'Ip Addr already dropped'
             return True
 
