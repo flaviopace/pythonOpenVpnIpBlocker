@@ -49,6 +49,21 @@ class RunCommand(object):
         print ipcmd
         subprocess.call(ipcmd, shell=True)
 
+    def getIpFromIptables(self, ipaddr):
+
+        opts = {'iptables': '/sbin/iptables', 'rule': '-L', 'nodns': '-n'}
+        ipcmd = '{iptables} {rule} {nodns}'.format(**opts)
+
+        print ipcmd
+
+        out = subprocess.call(ipcmd, shell=True)
+
+        if ipaddr in out:
+            print 'Ip Addr already dropped'
+            return True
+
+        return False
+
 
 
 if __name__ == "__main__":
@@ -70,4 +85,5 @@ if __name__ == "__main__":
     for item in p.getUniqueIpList():
         print " {} : {}".format(item, p.getIpList().count(item))
         if p.getIpList().count(item) > OFFSETVALUE:
-            rc.runCommand(item)
+            if not rc.getIpFromIptables(item):
+                rc.runCommand(item)
